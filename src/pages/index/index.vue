@@ -38,30 +38,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { performanceApi } from '@/mock/api'
 
 // 演出列表数据
-const performanceList = ref([
-  {
-    id: 1,
-    title: '2025张学友演唱会',
-    coverUrl: '/static/demo/jacky.jpg',
-    showTime: '2025-03-15 19:30',
-    venue: '深圳湾体育中心',
-    minPrice: 380,
-    status: 'on-sale',
-    statusText: '售票中'
-  },
-  {
-    id: 2,
-    title: '周杰伦嘉年华世界巡回演唱会',
-    coverUrl: '/static/demo/jay.jpg',
-    showTime: '2025-04-20 19:30',
-    venue: '深圳宝安体育场',
-    minPrice: 480,
-    status: 'coming-soon',
-    statusText: '即将开售'
-  }
-])
+const performanceList = ref([])
 
 // 加载状态
 const isLoading = ref(false)
@@ -69,7 +49,7 @@ const noMore = ref(false)
 const isRefreshing = ref(false)
 
 // 跳转到详情页
-const goToDetail = (id: number) => {
+const goToDetail = (id: string) => {
   uni.navigateTo({
     url: `/pages/performance/detail?id=${id}`
   })
@@ -80,24 +60,39 @@ const loadMore = async () => {
   if (isLoading.value || noMore.value) return
   
   isLoading.value = true
-  // 这里需要调用后端接口获取更多数据
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  isLoading.value = false
-  // 模拟没有更多数据
-  noMore.value = true
+  try {
+    const res = await performanceApi.getPerformanceList()
+    if (res.code === 0 && res.data.length > 0) {
+      performanceList.value = [...performanceList.value, ...res.data]
+    } else {
+      noMore.value = true
+    }
+  } catch (error) {
+    console.error('加载演出列表失败:', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // 刷新列表
 const onRefresh = async () => {
   isRefreshing.value = true
-  // 这里需要调用后端接口刷新数据
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  isRefreshing.value = false
+  try {
+    const res = await performanceApi.getPerformanceList()
+    if (res.code === 0) {
+      performanceList.value = res.data
+      noMore.value = false
+    }
+  } catch (error) {
+    console.error('刷新演出列表失败:', error)
+  } finally {
+    isRefreshing.value = false
+  }
 }
 
 // 页面加载时获取数据
 onMounted(() => {
-  // 这里需要调用后端接口获取初始数据
+  loadMore()
 })
 </script>
 

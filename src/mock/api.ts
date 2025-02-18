@@ -1,6 +1,6 @@
 // 模拟API接口
-import { performanceList, performanceDetail, sessionList, ticketList } from './performances'
-import { orderList, orderDetail, orderStatusMap } from './orders'
+import { performances } from './performances'
+import { orders, orderStatusMap } from './orders'
 
 // 延迟函数
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -9,26 +9,40 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 export const performanceApi = {
   // 获取演出列表
   getPerformanceList: async () => {
-    await delay(500) // 模拟网络延迟
-    return { code: 0, data: performanceList, message: 'success' }
+    await delay(500)
+    const list = performances.map(item => ({
+      id: item.id,
+      title: item.title,
+      coverUrl: item.coverUrl,
+      showTime: item.showTime,
+      venue: item.venue,
+      minPrice: item.minPrice,
+      status: item.status,
+      statusText: item.statusText
+    }))
+    return { code: 0, data: list, message: 'success' }
   },
 
   // 获取演出详情
   getPerformanceDetail: async (id: string) => {
     await delay(500)
-    return { code: 0, data: performanceDetail, message: 'success' }
+    const performance = performances.find(item => item.id === id)
+    return { code: 0, data: performance, message: 'success' }
   },
 
   // 获取场次列表
   getSessionList: async (performanceId: string) => {
     await delay(500)
-    return { code: 0, data: sessionList, message: 'success' }
+    const performance = performances.find(item => item.id === performanceId)
+    return { code: 0, data: performance?.sessions || [], message: 'success' }
   },
 
   // 获取票档列表
-  getTicketList: async (sessionId: number) => {
+  getTicketList: async (performanceId: string, sessionId: number) => {
     await delay(500)
-    return { code: 0, data: ticketList, message: 'success' }
+    const performance = performances.find(item => item.id === performanceId)
+    const session = performance?.sessions.find(s => s.id === sessionId)
+    return { code: 0, data: session?.tickets || [], message: 'success' }
   }
 }
 
@@ -37,8 +51,8 @@ export const orderApi = {
   // 获取订单列表
   getOrderList: async (status?: string) => {
     await delay(500)
-    let list = orderList
-    if (status) {
+    let list = orders
+    if (status && status !== 'all') {
       list = list.filter(item => item.status === status)
     }
     return { code: 0, data: list, message: 'success' }
@@ -47,13 +61,15 @@ export const orderApi = {
   // 获取订单详情
   getOrderDetail: async (id: string) => {
     await delay(500)
-    return { code: 0, data: orderDetail, message: 'success' }
+    const order = orders.find(item => item.id === id)
+    return { code: 0, data: order, message: 'success' }
   },
 
   // 创建订单
   createOrder: async (params: any) => {
     await delay(800)
-    return { code: 0, data: { orderId: 'ORDER' + Date.now() }, message: 'success' }
+    const orderId = 'ORDER' + Date.now()
+    return { code: 0, data: { orderId }, message: 'success' }
   },
 
   // 支付订单
