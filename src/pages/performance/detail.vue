@@ -11,7 +11,7 @@
     <view class="info-section">
       <view class="title">{{ performance.title }}</view>
       <view class="price">¥{{ performance.minPrice }}起</view>
-      
+
       <!-- 演出信息 -->
       <view class="info-list">
         <view class="info-item">
@@ -54,44 +54,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { performances } from '@/mock/performances'
+import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
-const performanceId = ref<number>(0)
+const performanceId = ref<string>('')
+onLoad((options) => {
+  performanceId.value = options?.id || ''
+})
+
 onMounted(() => {
-  const pages = getCurrentPages()
-  const page = pages[pages.length - 1]
-  performanceId.value = Number(page.$page?.options?.id || 0)
   // 获取演出详情数据
   getPerformanceDetail()
 })
 
 // 演出详情数据
-const performance = ref({
-  title: '2025张学友演唱会',
-  images: [
-    '/static/demo/jacky.jpg',
-    '/static/demo/jay.jpg',
-    '/static/demo/mayday.jpg',
-  ],
-  minPrice: 380,
-  showTime: '2025-03-15 19:30',
-  venue: '深圳湾体育中心',
-  duration: '约120分钟',
-  description: '<div>华语乐坛天王张学友2025世界巡回演唱会...</div>',
-  notices: [
-    '本演出不支持退换票',
-    '演出前3天不支持改期',
-    '儿童需购票入场'
-  ],
-  canBuy: true,
-  buttonText: '立即购票'
+const performance = ref<any>({})
+
+// 根据状态计算按钮文本和是否可购买
+const buttonInfo = computed(() => {
+  if (!performance.value.status) return { text: '暂未开售', canBuy: false }
+
+  switch (performance.value.status) {
+    case 'on_sale':
+      return { text: '立即购票', canBuy: true }
+    case 'coming_soon':
+      return { text: '即将开售', canBuy: false }
+    default:
+      return { text: '暂未开售', canBuy: false }
+  }
 })
 
 // 获取演出详情
-const getPerformanceDetail = async () => {
-  // 这里需要调用后端接口获取演出详情数据
-  console.log('获取演出ID:', performanceId.value)
+const getPerformanceDetail = () => {
+  if (!performanceId.value) return
+
+  // 从mock数据中查找对应id的演出
+  const found = performances.find(p => p.id === performanceId.value)
+  console.log('getPerformanceDetail', found)
+  if (found) {
+    performance.value = {
+      ...found,
+      notices: found.notice,
+      canBuy: found.status === 'on_sale',
+      buttonText: found.status === 'on_sale' ? '立即购票' : '即将开售'
+    }
+  }
 }
 
 // 处理购票
@@ -113,7 +122,7 @@ const handleBuy = () => {
 .banner {
   width: 100%;
   height: 500rpx;
-  
+
   .banner-image {
     width: 100%;
     height: 100%;
@@ -124,14 +133,14 @@ const handleBuy = () => {
   background-color: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  
+
   .title {
     font-size: 36rpx;
     font-weight: bold;
     color: $uni-text-color;
     margin-bottom: 20rpx;
   }
-  
+
   .price {
     font-size: 40rpx;
     color: #ff4d4f;
@@ -144,13 +153,13 @@ const handleBuy = () => {
   .info-item {
     display: flex;
     margin-bottom: 20rpx;
-    
+
     .label {
       width: 140rpx;
       color: $uni-text-color-grey;
       font-size: 28rpx;
     }
-    
+
     .value {
       flex: 1;
       color: $uni-text-color;
@@ -164,7 +173,7 @@ const handleBuy = () => {
   background-color: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  
+
   .section-title {
     font-size: 32rpx;
     font-weight: bold;
@@ -180,13 +189,13 @@ const handleBuy = () => {
     display: flex;
     align-items: flex-start;
     margin-bottom: 16rpx;
-    
+
     .dot {
       margin-right: 10rpx;
       color: $uni-text-color-grey;
       font-size: 28rpx;
     }
-    
+
     .text {
       flex: 1;
       font-size: 28rpx;
@@ -204,7 +213,7 @@ const handleBuy = () => {
   background-color: #fff;
   padding: 20rpx 30rpx;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-  
+
   .buy-btn {
     width: 100%;
     height: 80rpx;
@@ -213,7 +222,7 @@ const handleBuy = () => {
     color: #fff;
     font-size: 32rpx;
     border-radius: 40rpx;
-    
+
     &:disabled {
       background-color: #ccc;
     }

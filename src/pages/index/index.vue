@@ -50,6 +50,7 @@ const isRefreshing = ref(false)
 
 // 跳转到详情页
 const goToDetail = (id: string) => {
+  console.log('跳转到详情页', id)
   uni.navigateTo({
     url: `/pages/performance/detail?id=${id}`
   })
