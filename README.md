@@ -29,15 +29,12 @@
 ├── pages                 // 页面目录
 │   ├── user              // 用户模块
 │   │   ├── index.vue     // 我的页面
-│   │   └── orders.vue    // 订单列表
+│   │   └── orders.vue    // 订单列表页
 │   ├── performance       // 演出模块
 │   │   ├── detail.vue    // 演出详情页
 │   │   └── tickets.vue   // 选择票档页
 │   └── order             // 订单模块
-│       ├── confirm.vue   // 确认页
-│       └── detail.vue    // 订单详情
-├── components            // 公共组件
+│       ├── confirm.vue   // 确认购买页
+│       └── detail.vue    // 订单详情页
 ├── static                // 静态资源
-├── store                 // Vuex 状态管理
-└── common                // 公共方法/常量
 ```

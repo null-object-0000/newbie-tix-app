@@ -244,8 +244,9 @@ const increaseQuantity = () => {
 const handleConfirm = () => {
   if (!selectedTicket.value || !canConfirm.value) return
   
+  // 跳转到确认订单页面，传递必要的参数
   uni.navigateTo({
-    url: `/pages/order/confirm?id=${performanceId.value}&ticketId=${selectedTicket.value.id}&quantity=${quantity.value}`
+    url: `/pages/order/confirm?performanceId=${performanceId.value}&sessionId=${selectedSessionId.value}&ticketId=${selectedTicket.value.id}&quantity=${quantity.value}`
   })
 }
 </script>
