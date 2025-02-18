@@ -31,8 +31,8 @@
 │   │   ├── index.vue     // 我的页面
 │   │   └── orders.vue    // 订单列表
 │   ├── performance       // 演出模块
-│   │   ├── detail.vue    // 详情页
-│   │   └── tickets.vue   // 票档选择
+│   │   ├── detail.vue    // 演出详情页
+│   │   └── tickets.vue   // 选择票档页
 │   └── order             // 订单模块
 │       ├── confirm.vue   // 确认页
 │       └── detail.vue    // 订单详情
