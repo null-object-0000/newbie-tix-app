@@ -104,8 +104,18 @@ const order = ref({
 
 // 获取订单详情
 const getOrderDetail = async (id: string) => {
-  // TODO: 调用接口获取订单详情
-  console.log('获取订单详情', id)
+  try {
+    // 从mock数据获取订单详情
+    const { orderDetail } = await import('@/mock/orders')
+    // 更新订单信息
+    order.value = orderDetail
+  } catch (error) {
+    console.error('获取订单详情失败:', error)
+    uni.showToast({
+      title: '获取订单详情失败',
+      icon: 'error'
+    })
+  }
 }
 
 // 处理支付

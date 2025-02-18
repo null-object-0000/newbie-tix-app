@@ -128,9 +128,9 @@ const handlePay = async () => {
         title: '支付成功',
         icon: 'success'
       })
-      // 跳转到订单详情页
-      uni.redirectTo({
-        url: '/pages/order/detail?id=123' // TODO: 替换为实际订单ID
+      // 跳转到订单详情页，使用mock数据中的订单ID
+      uni.navigateTo({
+        url: '/pages/order/detail?id=1'
       })
     }, 2000)
   } catch (error) {
