@@ -367,8 +367,8 @@ const handleConfirm = () => {
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 
   .total-price {
-    font-size: 26rpx;
-    color: #666;
+    font-size: 28rpx;
+    color: $uni-text-color;
 
     .amount {
       font-size: 36rpx;
@@ -379,16 +379,18 @@ const handleConfirm = () => {
   }
 
   .confirm-btn {
-    width: 240rpx;
-    height: 88rpx;
-    line-height: 88rpx;
+    font-size: 32rpx;
+    padding: 20rpx 60rpx;
+    border-radius: 40rpx;
+    line-height: 80rpx;
     background-color: $uni-color-primary;
     color: #fff;
-    font-size: 32rpx;
-    border-radius: 44rpx;
+    text-align: center;
+    margin: 0;
 
     &:disabled {
-      background: #ccc;
+      opacity: 0.6;
+      background-color: #ccc;
     }
   }
 }
