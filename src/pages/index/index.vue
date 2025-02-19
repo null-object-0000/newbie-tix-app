@@ -36,7 +36,7 @@ import { performanceApi } from '@/mock/api'
 import type { Performance } from '@/types'
 
 // 演出列表数据
-const performanceList = ref<Partial<Performance>[]>([])
+const performanceList = ref<Performance[]>([])
 
 // 加载状态
 const isLoading = ref(false)
@@ -44,9 +44,8 @@ const noMore = ref(false)
 const isRefreshing = ref(false)
 
 // 跳转到详情页
-const goToDetail = (id: number | string | undefined) => {
+const goToDetail = (id: number) => {
   if (!id) return
-  console.log('跳转到详情页', id)
   uni.navigateTo({
     url: `/pages/performance/detail?id=${id}`
   })

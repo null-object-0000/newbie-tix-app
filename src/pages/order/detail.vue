@@ -1,5 +1,5 @@
 <template>
-  <view class="detail-page">
+  <view class="detail-page" v-if="order && performance && session && ticket">
     <!-- 订单状态 -->
     <view class="status-card">
       <view class="status-text" :class="order.status">
@@ -10,11 +10,11 @@
     <!-- 演出信息 -->
     <view class="performance-card">
       <view class="performance-info">
-        <image class="cover" :src="order.coverImage" mode="aspectFill" />
+        <image class="cover" :src="performance.coverUrl" mode="aspectFill" />
         <view class="info">
-          <view class="title">{{ order.title }}</view>
-          <view class="time">{{ order.showTime }}</view>
-          <view class="venue">{{ order.venue }}</view>
+          <view class="title">{{ performance.title }}</view>
+          <view class="time">{{ performance.showTime }}</view>
+          <view class="venue">{{ performance.venue }}</view>
         </view>
       </view>
     </view>
@@ -31,7 +31,7 @@
           <text class="label">下单时间</text>
           <text class="value">{{ order.createTime }}</text>
         </view>
-        <view class="info-item">
+        <view class="info-item" v-if="order.payTime">
           <text class="label">支付时间</text>
           <text class="value">{{ order.payTime || '-' }}</text>
         </view>
@@ -42,7 +42,7 @@
     <view class="ticket-card">
       <view class="section-title">票档信息</view>
       <view class="ticket-info">
-        <view class="area">{{ order.ticketArea }}</view>
+        <view class="area">{{ ticket.title }}</view>
         <view class="price-quantity">
           <text class="price">¥{{ order.price }}</text>
           <text class="quantity">x{{ order.quantity }}</text>
@@ -57,10 +57,6 @@
         <view class="amount-item">
           <text class="label">票面总价</text>
           <text class="value">¥{{ order.totalAmount }}</text>
-        </view>
-        <view class="amount-item">
-          <text class="label">服务费</text>
-          <text class="value">¥{{ order.serviceFee }}</text>
         </view>
         <view class="divider"></view>
         <view class="amount-item total">
@@ -79,58 +75,74 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import type { Order, Performance, PerformanceSession, PerformanceTicket } from '@/types'
+import { orders } from '@/mock/orders'
+import { performances } from '@/mock/performances'
+import { onLoad } from '@dcloudio/uni-app'
 
-// 获取订单ID
-const orderId = ref('')
+// 获取路由参数
+const orderNo = ref('')
 
-// 订单信息
-const order = ref({
-  status: 'unpaid',
-  statusText: '待支付',
-  coverImage: '/static/demo/performance-1.jpg',
-  title: '2024张学友演唱会',
-  showTime: '2024-03-15 19:30',
-  venue: '深圳湾体育中心',
-  orderNo: 'ORDER123456789',
-  createTime: '2024-01-20 14:30:00',
-  payTime: '',
-  ticketArea: 'A区',
-  price: 1280,
-  quantity: 2,
-  totalAmount: 2560,
-  serviceFee: 40,
-  finalAmount: 2600
+onLoad((options) => {
+  orderNo.value = options?.orderNo || ''
 })
 
+onMounted(() => {
+  if (orderNo.value) {
+    getOrderDetail(orderNo.value)
+  }
+})
+
+// 订单信息
+const order = ref<Order>()
+// 演出信息
+const performance = ref<Performance>()
+const session = ref<PerformanceSession>()
+const ticket = ref<PerformanceTicket>()
+
 // 获取订单详情
-const getOrderDetail = async (id: string) => {
-  try {
-    // 从mock数据获取订单详情
-    const { orderDetail } = await import('@/mock/orders')
-    // 更新订单信息
-    order.value = orderDetail
-  } catch (error) {
-    console.error('获取订单详情失败:', error)
-    uni.showToast({
-      title: '获取订单详情失败',
-      icon: 'error'
-    })
+const getOrderDetail = async (orderNo: string) => {
+  // 模拟API调用
+  const foundOrder = orders.find(item => item.orderNo === orderNo)
+  if (foundOrder) {
+    order.value = foundOrder
+
+    // 通过 status 赋值 statusText
+    if (order.value.status === 'paid') {
+      order.value.statusText = '已支付'
+    } else if (order.value.status === 'completed') {
+      order.value.statusText = '已完成'
+    } else if (order.value.status === 'cancelled') {
+      order.value.statusText = '已取消'
+    } else if (order.value.status === 'unpaid') {
+      order.value.statusText = '待支付'
+    }
+
+
+    // 获取演出信息
+    const foundPerformance = performances.find(item => item.id === foundOrder.performanceId)
+    if (foundPerformance) {
+      performance.value = foundPerformance
+
+      // 获取场次信息
+      const foundSession = foundPerformance.sessions?.find(item => item.id === foundOrder.sessionId)
+      if (foundSession) {
+        session.value = foundSession
+        // 获取票档信息
+        const foundTicket = foundSession.tickets?.find(item => item.id === foundOrder.ticketId)
+        if (foundTicket) {
+          ticket.value = foundTicket
+        }
+      }
+    }
   }
 }
 
 // 处理支付
 const handlePay = () => {
   // TODO: 调用支付接口
-  console.log('支付订单', orderId.value)
+  console.log('支付订单', orderNo.value)
 }
-
-onMounted(() => {
-  const page = getCurrentPages()[getCurrentPages().length - 1]
-  orderId.value = page.$page?.query?.id || ''
-  if (orderId.value) {
-    getOrderDetail(orderId.value)
-  }
-})
 </script>
 
 <style lang="scss">

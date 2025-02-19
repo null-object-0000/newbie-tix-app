@@ -41,6 +41,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { orders } from '@/mock/orders'
+
+// 当前选中的订单类型
+const currentType = ref('')
+
+onLoad((options) => {
+  currentType.value = options?.type || ''
+})
+
+// 页面加载时获取类型参数并加载订单
+onMounted(() => {
+  loadOrders(currentType.value)
+})
 
 // 标签页配置
 const tabs = [
@@ -49,52 +63,8 @@ const tabs = [
   { label: '已完成', value: 'completed' }
 ]
 
-// 当前选中的订单类型
-const currentType = ref('')
-
 // 订单列表数据
-const orderList = ref([
-  {
-    id: '1',
-    orderNo: 'ORDER202401010001',
-    status: 'unpaid',
-    title: '周杰伦2025巡回演唱会',
-    coverUrl: '/static/demo/jay.jpg',
-    showTime: '2025-03-15 19:30',
-    price: 1280,
-    totalAmount: 1280
-  },
-  {
-    id: '2',
-    orderNo: 'ORDER202401010002',
-    status: 'completed',
-    title: '五月天2025演唱会',
-    coverUrl: '/static/demo/mayday.jpg',
-    showTime: '2025-04-20 19:30',
-    price: 980,
-    totalAmount: 1960
-  },
-  {
-    id: '3',
-    orderNo: 'ORDER202401010003',
-    status: 'unpaid',
-    title: '张学友2024演唱会',
-    coverUrl: '/static/demo/jacky.jpg',
-    showTime: '2025-05-01 19:30',
-    price: 1580,
-    totalAmount: 1580
-  },
-  {
-    id: '4',
-    orderNo: 'ORDER202401010004',
-    status: 'completed',
-    title: '林俊杰2024巡回演唱会',
-    coverUrl: '/static/demo/jj.jpg',
-    showTime: '2025-06-10 19:30',
-    price: 1180,
-    totalAmount: 2360
-  }
-])
+const orderList = ref(orders)
 
 // 获取状态文本
 const getStatusText = (status: string) => {
@@ -152,15 +122,6 @@ const handlePay = async (order: any) => {
     })
   }
 }
-
-// 页面加载时获取类型参数并加载订单
-onMounted(() => {
-  const pages = getCurrentPages()
-  const page = pages[pages.length - 1]
-  const type = page.$page?.query?.type || 'all'
-  currentType.value = type
-  loadOrders(type)
-})
 </script>
 
 <style lang="scss">

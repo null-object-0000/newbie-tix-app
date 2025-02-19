@@ -12,39 +12,39 @@
     <view class="session-list">
       <view class="section-title">选择场次</view>
       <radio-group @change="handleSessionSelect">
-        <label class="session-item" v-for="session in sessions" :key="session.id" 
-          :class="{ disabled: !session.canBuy, selected: selectedSessionId === session.id }">
+        <label class="session-item" v-for="session in sessions" :key="session.id"
+          :class="{ disabled: session.status === 'sold_out', selected: selectedSessionId === session.id }">
           <view class="session-info">
             <view class="time-box">
-              <text class="date">{{ session.date }}</text>
-              <text class="time">{{ session.time }}</text>
+              <text class="date">{{ formatDate(session.startShowTime) }}</text>
+              <text class="time">{{ formatTime(session.startShowTime) }}</text>
             </view>
-            <view class="status-tag" :class="{ 'sold-out': !session.canBuy }">
-              {{ session.canBuy ? '可购买' : '已售罄' }}
+            <view class="status-tag" :class="{ 'sold-out': session.status === 'sold_out' }">
+              {{ session.status === 'on_sale' ? '可购买' : '已售罄' }}
             </view>
           </view>
-          <radio class="hidden-radio" :value="session.id.toString()" :disabled="!session.canBuy"
+          <radio class="hidden-radio" :value="session.id.toString()" :disabled="session.status === 'sold_out'"
             :checked="selectedSessionId === session.id" />
         </label>
       </radio-group>
     </view>
 
     <!-- 票档列表 -->
-    <view class="ticket-list" v-if="selectedSessionId">
+    <view class="ticket-list" v-if="selectedSessionId && selectedSession?.tickets">
       <view class="section-title">选择票档</view>
       <radio-group @change="handleTicketSelect">
-        <label class="ticket-item" v-for="ticket in tickets" :key="ticket.id" 
-          :class="{ disabled: ticket.stock === 0, selected: selectedTicketId === ticket.id }">
+        <label class="ticket-item" v-for="ticket in selectedSession.tickets" :key="ticket.id"
+          :class="{ disabled: !ticket.hasStock, selected: selectedTicketId === ticket.id }">
           <view class="ticket-info">
             <view class="price-box">
               <text class="price">¥{{ ticket.price }}</text>
-              <text class="area">[{{ ticket.area }}]</text>
+              <text class="area">[{{ ticket.title }}]</text>
             </view>
-            <view class="status-tag" :class="{ 'sold-out': ticket.stock === 0 }">
-              {{ ticket.stock > 0 ? '可购买' : '已售罄' }}
+            <view class="status-tag" :class="{ 'sold-out': !ticket.hasStock }">
+              {{ ticket.hasStock ? '可购买' : '已售罄' }}
             </view>
           </view>
-          <radio class="hidden-radio" :value="ticket.id.toString()" :disabled="ticket.stock === 0"
+          <radio class="hidden-radio" :value="ticket.id.toString()" :disabled="!ticket.hasStock"
             :checked="selectedTicketId === ticket.id" />
         </label>
       </radio-group>
@@ -54,10 +54,9 @@
     <view class="quantity-section" v-if="selectedTicket">
       <view class="section-title">购买数量</view>
       <view class="quantity-box">
-        <button class="qty-btn" @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
+        <button class="qty-btn minus" @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
         <text class="quantity">{{ quantity }}</text>
-        <button class="qty-btn" @click="increaseQuantity"
-          :disabled="quantity >= maxQuantity || quantity >= selectedTicket?.stock">+</button>
+        <button class="qty-btn plus" @click="increaseQuantity" :disabled="quantity >= maxQuantity">+</button>
       </view>
     </view>
 
@@ -74,14 +73,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
+import type { Performance, PerformanceSession } from '@/types'
 import { performanceApi } from '@/mock/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
-const performanceId = ref<string>('')
+const performanceId = ref<number>()
 onLoad((options) => {
-  performanceId.value = options?.id || ''
+  performanceId.value = Number(options?.id) || 0
 })
 
 onMounted(() => {
@@ -98,40 +97,24 @@ const sessions = ref<PerformanceSession[]>([])
 // 选中的场次ID
 const selectedSessionId = ref<number>()
 
-// 票档数据
-const tickets = ref<PerformanceTicket[]>([])
-
-// 获取演出详情和票档数据
-const getPerformanceTickets = async () => {
-  if (!performanceId.value) return
-
-  // 通过API获取演出详情
-  const result = await performanceApi.getPerformanceDetail(performanceId.value)
-  if (result && result.data) {
-    performance.value = result.data
-    sessions.value = result.data.sessions || []
-  }
-}
-
-// 根据场次获取票档数据
-const getSessionTickets = (sessionId: number) => {
-  const session = sessions.value.find(s => s.id === sessionId)
-  tickets.value = session?.tickets || []
-}
+// 选中的场次信息
+const selectedSession = computed(() => {
+  return sessions.value.find(session => session.id === selectedSessionId.value)
+})
 
 // 选中的票档ID
 const selectedTicketId = ref<number>()
 
 // 选中的票档信息
 const selectedTicket = computed(() => {
-  return tickets.value.find(ticket => ticket.id === selectedTicketId.value)
+  return selectedSession.value?.tickets?.find(ticket => ticket.id === selectedTicketId.value)
 })
 
 // 购买数量
 const quantity = ref(1)
-const maxQuantity = 6
+const maxQuantity = 4
 
-// 总价
+// 总金额
 const totalAmount = computed(() => {
   if (!selectedTicket.value) return 0
   return selectedTicket.value.price * quantity.value
@@ -139,24 +122,30 @@ const totalAmount = computed(() => {
 
 // 是否可以确认
 const canConfirm = computed(() => {
-  return selectedTicket.value && quantity.value > 0
+  return selectedSessionId.value && selectedTicketId.value && quantity.value > 0
 })
 
-// 选择场次
-const handleSessionSelect = (e: any) => {
-  const sessionId = Number(e.detail.value)
-  selectedSessionId.value = sessionId
-  // 重置票档选择
-  selectedTicketId.value = undefined
-  quantity.value = 1
-  // 获取对应场次的票档数据
-  getSessionTickets(sessionId)
+// 获取演出详情和票档信息
+const getPerformanceTickets = async () => {
+  if (!performanceId.value) return
+
+  const result = await performanceApi.getPerformanceDetail(performanceId.value)
+  if (result && result.data) {
+    performance.value = result.data
+    sessions.value = result.data.sessions || []
+  }
 }
 
-// 选择票档
+// 处理场次选择
+const handleSessionSelect = (e: any) => {
+  selectedSessionId.value = Number(e.detail.value)
+  selectedTicketId.value = undefined
+  quantity.value = 1
+}
+
+// 处理票档选择
 const handleTicketSelect = (e: any) => {
   selectedTicketId.value = Number(e.detail.value)
-  // 重置购买数量
   quantity.value = 1
 }
 
@@ -169,23 +158,34 @@ const decreaseQuantity = () => {
 
 // 增加数量
 const increaseQuantity = () => {
-  if (selectedTicket.value && quantity.value < maxQuantity && quantity.value < selectedTicket.value.stock) {
+  if (quantity.value < maxQuantity) {
     quantity.value++
   }
 }
 
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr)
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+}
+
+// 格式化时间
+const formatTime = (dateStr: string) => {
+  const date = new Date(dateStr)
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+
 // 确认选择
 const handleConfirm = () => {
-  if (!selectedTicket.value || !canConfirm.value) return
+  if (!canConfirm.value) return
 
-  // 跳转到确认订单页面，传递必要的参数
   uni.navigateTo({
-    url: `/pages/order/confirm?performanceId=${performanceId.value}&sessionId=${selectedSessionId.value}&ticketId=${selectedTicket.value.id}&quantity=${quantity.value}`
+    url: `/pages/order/confirm?performanceId=${performanceId.value}&sessionId=${selectedSessionId.value}&ticketId=${selectedTicketId.value}&quantity=${quantity.value}`
   })
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tickets-page {
   min-height: 100vh;
   background-color: #f5f5f5;
@@ -331,8 +331,9 @@ const handleConfirm = () => {
     .qty-btn {
       width: 60rpx;
       height: 60rpx;
-      line-height: 56rpx;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border: 2rpx solid #ddd;
       border-radius: 30rpx;
       background-color: #fff;

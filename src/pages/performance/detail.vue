@@ -22,10 +22,6 @@
           <text class="label">演出场馆</text>
           <text class="value">{{ performance.venue }}</text>
         </view>
-        <view class="info-item">
-          <text class="label">演出时长</text>
-          <text class="value">{{ performance.duration }}</text>
-        </view>
       </view>
     </view>
 
@@ -39,7 +35,7 @@
     <view class="notice-section">
       <view class="section-title">购票须知</view>
       <view class="notice-list">
-        <view class="notice-item" v-for="(item, index) in performance?.notices" :key="index">
+        <view class="notice-item" v-for="(item, index) in performance.notices" :key="index">
           <text class="dot">·</text>
           <text class="text">{{ item }}</text>
         </view>
@@ -48,7 +44,9 @@
 
     <!-- 底部购票按钮 -->
     <view class="footer">
-      <button class="buy-btn" :disabled="!performance.canBuy" @click="handleBuy">{{ buttonText }}</button>
+      <button class="buy-btn" :disabled="performance.status !== 'on_sale'" @click="handleBuy">
+        {{ performance.statusText }}
+      </button>
     </view>
   </view>
 </template>
@@ -60,9 +58,9 @@ import { onLoad } from '@dcloudio/uni-app'
 import type { Performance } from '@/types'
 
 // 获取路由参数
-const performanceId = ref<string>('')
+const performanceId = ref<number>()
 onLoad((options) => {
-  performanceId.value = options?.id || ''
+  performanceId.value = Number(options?.id) || 0
 })
 
 onMounted(() => {
@@ -80,28 +78,20 @@ const getPerformanceDetail = async () => {
   // 通过API获取演出详情
   const result = await performanceApi.getPerformanceDetail(performanceId.value)
   if (result && result.data) {
-    performance.value = {
-      ...result.data,
-      notices: result.data.notices,
-      canBuy: result.data.status === 'on_sale'
+    performance.value = result.data
+    if (performance.value.status === 'on_sale') {
+      performance.value.statusText = '立即购票'
+    } else if (performance.value.status === 'coming_soon') {
+      performance.value.statusText = '即将开售'
+    } else if (performance.value.status === 'sold_out') {
+      performance.value.statusText = '已售罄'
     }
   }
 }
 
-const buttonText = computed(() => {
-  // 根据演出状态返回不同的按钮文本
-  if (performance.value?.status === 'on_sale') {
-    return '立即购票'
-  } else if (performance.value?.status === 'coming_soon') {
-    return '即将开售'
-  } else if (performance.value?.status === 'sold_out') {
-    return '已售罄'
-  }
-})
-
 // 处理购票
 const handleBuy = () => {
-  if (!performance.value?.canBuy) return
+  if (performance.value?.status !== 'on_sale') return
   uni.navigateTo({
     url: `/pages/performance/tickets?id=${performanceId.value}`
   })

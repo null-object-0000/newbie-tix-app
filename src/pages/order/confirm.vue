@@ -1,12 +1,12 @@
 <template>
-  <view class="confirm-page" v-if="performance">
+  <view class="confirm-page" v-if="performance && session">
     <!-- 演出信息 -->
     <view class="performance-card">
       <view class="title">{{ performance.title }}</view>
       <view class="info-list">
         <view class="info-item">
-          <text class="label">演出时间</text>
-          <text class="value">{{ performance.showTime }}</text>
+          <text class="label">演出场次</text>
+          <text class="value">{{ formatDate(session.startShowTime) }} {{ formatTime(session.startShowTime) }}</text>
         </view>
         <view class="info-item">
           <text class="label">演出场馆</text>
@@ -19,9 +19,9 @@
     <view class="ticket-card">
       <view class="section-title">票档信息</view>
       <view class="ticket-info">
-        <view class="area">{{ ticket.area }}</view>
+        <view class="area">{{ ticket?.title }}</view>
         <view class="price-quantity">
-          <text class="price">¥{{ ticket.price }}</text>
+          <text class="price">¥{{ ticket?.price }}</text>
           <text class="quantity">x{{ quantity }}</text>
         </view>
       </view>
@@ -29,48 +29,39 @@
 
     <!-- 订单金额 -->
     <view class="amount-card">
-      <view class="amount-item">
-        <text class="label">票面总价</text>
-        <text class="value">¥{{ totalAmount }}</text>
-      </view>
-      <view class="amount-item">
-        <text class="label">服务费</text>
-        <text class="value">¥{{ serviceFee }}</text>
-      </view>
-      <view class="divider"></view>
       <view class="amount-item total">
         <text class="label">实付金额</text>
-        <text class="value price">¥{{ finalAmount }}</text>
+        <text class="value price">¥{{ totalAmount }}</text>
       </view>
     </view>
+  </view>
 
-    <!-- 支付按钮 -->
-    <view class="footer">
-      <view class="total-amount">
-        <text class="label">需支付：</text>
-        <text class="price">¥{{ finalAmount }}</text>
-      </view>
-      <button class="pay-btn" @click="handlePay">立即支付</button>
+  <!-- 支付按钮 -->
+  <view class="footer">
+    <view class="total-amount">
+      <text class="label">需支付：</text>
+      <text class="price">¥{{ finalAmount }}</text>
     </view>
+    <button class="pay-btn" @click="handlePay">立即支付</button>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { Performance } from '@/types'
+import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
 import { performanceApi } from '@/mock/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
-const performanceId = ref<string>('')
-const sessionId = ref<string>('')
-const ticketId = ref<string>('')
+const performanceId = ref<number>()
+const sessionId = ref<number>()
+const ticketId = ref<number>()
 const quantity = ref<number>(1)
 
 onLoad((options) => {
-  performanceId.value = options?.performanceId || ''
-  sessionId.value = options?.sessionId || ''
-  ticketId.value = options?.ticketId || ''
+  performanceId.value = Number(options?.performanceId) || 0
+  sessionId.value = Number(options?.sessionId) || 0
+  ticketId.value = Number(options?.ticketId) || 0
   quantity.value = Number(options?.quantity) || 1
 })
 
@@ -81,24 +72,16 @@ onMounted(() => {
 
 // 演出信息
 const performance = ref<Performance>()
-
-// 票档信息
-const ticket = ref({
-  area: '',
-  price: 0
-})
+const session = ref<PerformanceSession>()
+const ticket = ref<PerformanceTicket>()
 
 // 计算金额
 const totalAmount = computed(() => {
-  return ticket.value.price * quantity.value
-})
-
-const serviceFee = computed(() => {
-  return Math.floor(totalAmount.value * 0.05) // 5%服务费
+  return (ticket.value?.price || 0) * quantity.value
 })
 
 const finalAmount = computed(() => {
-  return totalAmount.value + serviceFee.value
+  return totalAmount.value
 })
 
 // 获取订单信息
@@ -111,16 +94,24 @@ const getOrderInfo = async () => {
     performance.value = result.data
 
     // 获取选中的场次和票档信息
-    const session = result.data.sessions?.find(s => s.id.toString() === sessionId.value)
-    const selectedTicket = session?.tickets?.find(t => t.id.toString() === ticketId.value)
-
-    if (selectedTicket) {
-      ticket.value = {
-        area: selectedTicket.area,
-        price: selectedTicket.price
-      }
+    const selectedSession = result.data.sessions?.find(s => s.id === sessionId.value)
+    if (selectedSession) {
+      session.value = selectedSession
+      ticket.value = selectedSession.tickets?.find(t => t.id === ticketId.value)
     }
   }
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr)
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+}
+
+// 格式化时间
+const formatTime = (dateStr: string) => {
+  const date = new Date(dateStr)
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
 }
 
 // 处理支付
@@ -138,7 +129,7 @@ const handlePay = async () => {
       })
       // 跳转到订单详情页，使用mock数据中的订单ID
       uni.navigateTo({
-        url: '/pages/order/detail?id=1'
+        url: '/pages/order/detail?orderNo=ORDER202401200001'
       })
     }, 2000)
   } catch (error) {
