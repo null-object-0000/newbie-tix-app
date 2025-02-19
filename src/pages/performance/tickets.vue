@@ -76,13 +76,15 @@
 import { ref, computed, onMounted } from 'vue'
 import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
 import { performances } from '@/mock/performances'
+import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
-const performanceId = ref<number>(0)
+const performanceId = ref<string>('')
+onLoad((options) => {
+  performanceId.value = options?.id || ''
+})
+
 onMounted(() => {
-  const pages = getCurrentPages()
-  const page = pages[pages.length - 1]
-  performanceId.value = Number(page.$page?.options?.id || 0)
   // 获取演出详情和票档数据
   getPerformanceTickets()
 })

@@ -1,5 +1,5 @@
 <template>
-  <view class="confirm-page">
+  <view class="confirm-page" v-if="performance">
     <!-- 演出信息 -->
     <view class="performance-card">
       <view class="title">{{ performance.title }}</view>
@@ -57,38 +57,35 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import type { Performance, Order } from '@/types'
+import { performances } from '@/mock/performances'
+import { onLoad } from '@dcloudio/uni-app'
 
-// 获取页面参数
+// 获取路由参数
 const performanceId = ref<string>('')
 const sessionId = ref<string>('')
 const ticketId = ref<string>('')
 const quantity = ref<number>(1)
 
+onLoad((options) => {
+  performanceId.value = options?.performanceId || ''
+  sessionId.value = options?.sessionId || ''
+  ticketId.value = options?.ticketId || ''
+  quantity.value = Number(options?.quantity) || 1
+})
+
 onMounted(() => {
-  const pages = getCurrentPages()
-  const page = pages[pages.length - 1]
-  const params = page.$page?.options
-
-  performanceId.value = params?.performanceId || ''
-  sessionId.value = params?.sessionId || ''
-  ticketId.value = params?.ticketId || ''
-  quantity.value = Number(params?.quantity) || 1
-
   // 获取订单详情
   getOrderInfo()
 })
 
 // 演出信息
-const performance = ref({
-  title: '周杰伦2025巡回演唱会',
-  showTime: '2025-03-15 19:30',
-  venue: '深圳湾体育中心'
-})
+const performance = ref<Performance>()
 
 // 票档信息
 const ticket = ref({
-  area: 'A区',
-  price: 1280
+  area: '',
+  price: 0
 })
 
 // 计算金额
@@ -106,13 +103,17 @@ const finalAmount = computed(() => {
 
 // 获取订单信息
 const getOrderInfo = async () => {
-  // TODO: 调用后端接口获取演出和票档信息
-  console.log('获取订单信息', {
-    performanceId: performanceId.value,
-    sessionId: sessionId.value,
-    ticketId: ticketId.value,
-    quantity: quantity.value
-  })
+  // 从mock数据获取演出信息
+  const mockPerformance = performances.find(p => p.id.toString() === performanceId.value)
+  if (mockPerformance) {
+    performance.value = mockPerformance
+  }
+
+  // TODO: 从后端获取票档信息
+  ticket.value = {
+    area: 'A区',
+    price: 1280
+  }
 }
 
 // 处理支付
