@@ -1,5 +1,5 @@
 <template>
-  <view class="tickets-page">
+  <view class="tickets-page" v-if="performance">
     <!-- 演出基本信息 -->
     <view class="performance-info">
       <view class="title">{{ performance.title }}</view>
@@ -51,7 +51,7 @@
     </view>
 
     <!-- 购买数量 -->
-    <view class="quantity-section" v-if="selectedTicketId">
+    <view class="quantity-section" v-if="selectedTicket">
       <view class="section-title">购买数量</view>
       <view class="quantity-box">
         <button class="qty-btn" @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
@@ -74,6 +74,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
+import { performances } from '@/mock/performances'
 
 // 获取路由参数
 const performanceId = ref<number>(0)
@@ -86,70 +88,33 @@ onMounted(() => {
 })
 
 // 演出基本信息
-const performance = ref({
-  title: '2025张学友演唱会',
-  venue: '深圳湾体育中心'
-})
+const performance = ref<Performance>()
 
 // 场次数据
-const sessions = ref([
-  {
-    id: 1,
-    date: '2025-03-15',
-    time: '19:30',
-    canBuy: true
-  },
-  {
-    id: 2,
-    date: '2025-03-16',
-    time: '19:30',
-    canBuy: true
-  },
-  {
-    id: 3,
-    date: '2025-03-17',
-    time: '19:30',
-    canBuy: false
-  }
-])
+const sessions = ref<PerformanceSession[]>([])
 
 // 选中的场次ID
 const selectedSessionId = ref<number>()
 
 // 票档数据
-const tickets = ref<any[]>([])
+const tickets = ref<PerformanceTicket[]>([])
+
+// 获取演出详情和票档数据
+const getPerformanceTickets = () => {
+  if (!performanceId.value) return
+
+  // 从mock数据中查找对应id的演出
+  const found = performances.find(p => p.id === performanceId.value.toString())
+  if (found) {
+    performance.value = found
+    sessions.value = found.sessions || []
+  }
+}
 
 // 根据场次获取票档数据
-const getSessionTickets = async (sessionId: number) => {
-  // 这里需要调用后端接口获取对应场次的票档数据
-  console.log('获取场次票档数据:', sessionId)
-  // 模拟数据
-  tickets.value = [
-    {
-      id: 1,
-      price: 1580,
-      area: 'A区',
-      stock: 100
-    },
-    {
-      id: 2,
-      price: 1280,
-      area: 'B区',
-      stock: 200
-    },
-    {
-      id: 3,
-      price: 980,
-      area: 'C区',
-      stock: 0
-    },
-    {
-      id: 4,
-      price: 680,
-      area: 'D区',
-      stock: 300
-    }
-  ]
+const getSessionTickets = (sessionId: number) => {
+  const session = sessions.value.find(s => s.id === sessionId)
+  tickets.value = session?.tickets || []
 }
 
 // 选中的票档ID
@@ -174,12 +139,6 @@ const totalAmount = computed(() => {
 const canConfirm = computed(() => {
   return selectedTicket.value && quantity.value > 0
 })
-
-// 获取演出票档信息
-const getPerformanceTickets = async () => {
-  // 这里需要调用后端接口获取演出详情和场次数据
-  console.log('获取演出ID:', performanceId.value)
-}
 
 // 选择场次
 const handleSessionSelect = (e: any) => {

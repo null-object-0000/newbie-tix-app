@@ -2,12 +2,8 @@
   <view class="orders-page">
     <!-- 订单状态切换 -->
     <view class="status-tabs">
-      <view 
-        v-for="tab in tabs" 
-        :key="tab.value"
-        :class="['tab-item', { active: currentType === tab.value }]"
-        @click="handleTabChange(tab.value)"
-      >
+      <view v-for="tab in tabs" :key="tab.value" :class="['tab-item', { active: currentType === tab.value }]"
+        @click="handleTabChange(tab.value)">
         {{ tab.label }}
       </view>
     </view>
@@ -17,13 +13,7 @@
       <view v-if="orderList.length === 0" class="empty-tip">
         暂无订单
       </view>
-      <view 
-        v-else
-        v-for="order in orderList" 
-        :key="order.id"
-        class="order-item"
-        @click="navigateToDetail(order.id)"
-      >
+      <view v-else v-for="order in orderList" :key="order.id" class="order-item" @click="navigateToDetail(order.id)">
         <view class="order-header">
           <text class="order-no">订单号：{{ order.orderNo }}</text>
           <text :class="['order-status', order.status]">{{ getStatusText(order.status) }}</text>
@@ -39,15 +29,9 @@
         <view class="order-footer">
           <text class="total">合计：¥{{ order.totalAmount }}</text>
           <view class="btn-group">
-            <button 
-              v-if="order.status === 'unpaid'"
-              class="action-btn pay-btn"
-              @click.stop="handlePay(order)"
-            >去支付</button>
-            <button 
-              v-if="order.status === 'completed'"
-              class="action-btn detail-btn"
-            >查看详情</button>
+            <button v-if="order.status === 'unpaid'" class="action-btn pay-btn"
+              @click.stop="handlePay(order)">去支付</button>
+            <button v-if="order.status === 'completed'" class="action-btn detail-btn">查看详情</button>
           </view>
         </view>
       </view>

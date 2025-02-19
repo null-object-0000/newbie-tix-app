@@ -68,7 +68,7 @@ onMounted(() => {
   const pages = getCurrentPages()
   const page = pages[pages.length - 1]
   const params = page.$page?.options
-  
+
   performanceId.value = params?.performanceId || ''
   sessionId.value = params?.sessionId || ''
   ticketId.value = params?.ticketId || ''
@@ -120,7 +120,7 @@ const handlePay = async () => {
   try {
     // TODO: 调用后端接口创建订单并发起支付
     uni.showLoading({ title: '正在发起支付...' })
-    
+
     // 模拟支付过程
     setTimeout(() => {
       uni.hideLoading()
@@ -169,13 +169,13 @@ const handlePay = async () => {
     .info-item {
       display: flex;
       margin-bottom: 16rpx;
-      
+
       .label {
         width: 140rpx;
         color: $uni-text-color-grey;
         font-size: 28rpx;
       }
-      
+
       .value {
         flex: 1;
         color: $uni-text-color;
@@ -195,19 +195,19 @@ const handlePay = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .area {
     font-size: 28rpx;
     color: $uni-text-color;
   }
-  
+
   .price-quantity {
     .price {
       font-size: 32rpx;
       color: #ff4d4f;
       margin-right: 20rpx;
     }
-    
+
     .quantity {
       font-size: 28rpx;
       color: $uni-text-color-grey;
@@ -220,16 +220,16 @@ const handlePay = async () => {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20rpx;
-    
+
     .label {
       color: $uni-text-color-grey;
       font-size: 28rpx;
     }
-    
+
     .value {
       color: $uni-text-color;
       font-size: 28rpx;
-      
+
       &.price {
         color: #ff4d4f;
         font-size: 32rpx;
@@ -237,13 +237,13 @@ const handlePay = async () => {
       }
     }
   }
-  
+
   .divider {
     height: 2rpx;
     background-color: #eee;
     margin: 20rpx 0;
   }
-  
+
   .total {
     margin-bottom: 0;
   }
@@ -260,20 +260,20 @@ const handlePay = async () => {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-  
+
   .total-amount {
     .label {
       font-size: 28rpx;
       color: $uni-text-color;
     }
-    
+
     .price {
       font-size: 36rpx;
       color: #ff4d4f;
       font-weight: bold;
     }
   }
-  
+
   .pay-btn {
     background-color: #ff4d4f;
     color: #fff;

@@ -143,12 +143,12 @@ onMounted(() => {
 .status-card {
   background-color: $uni-color-primary;
   padding: 40rpx 30rpx;
-  
+
   .status-text {
     font-size: 36rpx;
     color: #fff;
     font-weight: bold;
-    
+
     &.completed {
       color: #52c41a;
     }
@@ -172,24 +172,24 @@ onMounted(() => {
 
 .performance-info {
   display: flex;
-  
+
   .cover {
     width: 160rpx;
     height: 200rpx;
     border-radius: 8rpx;
     margin-right: 20rpx;
   }
-  
+
   .info {
     flex: 1;
-    
+
     .title {
       font-size: 28rpx;
       font-weight: bold;
       color: $uni-text-color;
       margin-bottom: 10rpx;
     }
-    
+
     .time,
     .venue {
       font-size: 24rpx;
@@ -204,12 +204,12 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16rpx;
-    
+
     .label {
       color: $uni-text-color-grey;
       font-size: 28rpx;
     }
-    
+
     .value {
       color: $uni-text-color;
       font-size: 28rpx;
@@ -221,19 +221,19 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .area {
     font-size: 28rpx;
     color: $uni-text-color;
   }
-  
+
   .price-quantity {
     .price {
       font-size: 32rpx;
       color: #ff4d4f;
       margin-right: 20rpx;
     }
-    
+
     .quantity {
       font-size: 28rpx;
       color: $uni-text-color-grey;
@@ -246,16 +246,16 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16rpx;
-    
+
     .label {
       color: $uni-text-color-grey;
       font-size: 28rpx;
     }
-    
+
     .value {
       color: $uni-text-color;
       font-size: 28rpx;
-      
+
       &.price {
         color: #ff4d4f;
         font-size: 32rpx;
@@ -263,13 +263,13 @@ onMounted(() => {
       }
     }
   }
-  
+
   .divider {
     height: 2rpx;
     background-color: #eee;
     margin: 20rpx 0;
   }
-  
+
   .total {
     margin-bottom: 0;
   }
@@ -285,7 +285,7 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-  
+
   .pay-btn {
     width: 240rpx;
     height: 80rpx;
