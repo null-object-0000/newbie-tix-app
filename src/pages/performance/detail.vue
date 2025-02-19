@@ -1,5 +1,5 @@
 <template>
-  <view class="detail-page">
+  <view class="detail-page" v-if="performance">
     <!-- 演出海报 -->
     <swiper class="banner" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500">
       <swiper-item v-for="(image, index) in performance.images" :key="index">
@@ -39,7 +39,7 @@
     <view class="notice-section">
       <view class="section-title">购票须知</view>
       <view class="notice-list">
-        <view class="notice-item" v-for="(item, index) in performance.notices" :key="index">
+        <view class="notice-item" v-for="(item, index) in performance?.notices" :key="index">
           <text class="dot">·</text>
           <text class="text">{{ item }}</text>
         </view>
@@ -48,7 +48,7 @@
 
     <!-- 底部购票按钮 -->
     <view class="footer">
-      <button class="buy-btn" :disabled="!performance.canBuy" @click="handleBuy">{{ performance.buttonText }}</button>
+      <button class="buy-btn" :disabled="!performance.canBuy" @click="handleBuy">{{ buttonText }}</button>
     </view>
   </view>
 </template>
@@ -57,6 +57,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { performances } from '@/mock/performances'
 import { onLoad } from '@dcloudio/uni-app'
+import type { Performance } from '@/types'
 
 // 获取路由参数
 const performanceId = ref<string>('')
@@ -70,21 +71,7 @@ onMounted(() => {
 })
 
 // 演出详情数据
-const performance = ref<any>({})
-
-// 根据状态计算按钮文本和是否可购买
-const buttonInfo = computed(() => {
-  if (!performance.value.status) return { text: '暂未开售', canBuy: false }
-
-  switch (performance.value.status) {
-    case 'on_sale':
-      return { text: '立即购票', canBuy: true }
-    case 'coming_soon':
-      return { text: '即将开售', canBuy: false }
-    default:
-      return { text: '暂未开售', canBuy: false }
-  }
-})
+const performance = ref<Performance>()
 
 // 获取演出详情
 const getPerformanceDetail = () => {
@@ -92,20 +79,29 @@ const getPerformanceDetail = () => {
 
   // 从mock数据中查找对应id的演出
   const found = performances.find(p => p.id === performanceId.value)
-  console.log('getPerformanceDetail', found)
   if (found) {
     performance.value = {
       ...found,
-      notices: found.notice,
-      canBuy: found.status === 'on_sale',
-      buttonText: found.status === 'on_sale' ? '立即购票' : '即将开售'
+      notices: found.notices,
+      canBuy: found.status === 'on_sale'
     }
   }
 }
 
+const buttonText = computed(() => {
+  // 根据演出状态返回不同的按钮文本
+  if (performance.value?.status === 'on_sale') {
+    return '立即购票'
+  } else if (performance.value?.status === 'coming_soon') {
+    return '即将开售'
+  } else if (performance.value?.status === 'sold_out') {
+    return '已售罄'
+  }
+})
+
 // 处理购票
 const handleBuy = () => {
-  if (!performance.value.canBuy) return
+  if (!performance.value?.canBuy) return
   uni.navigateTo({
     url: `/pages/performance/tickets?id=${performanceId.value}`
   })

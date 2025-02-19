@@ -12,12 +12,7 @@
     <view class="session-list">
       <view class="section-title">选择场次</view>
       <radio-group @change="handleSessionSelect">
-        <view 
-          class="session-item" 
-          v-for="session in sessions" 
-          :key="session.id"
-          :class="{ disabled: !session.canBuy }"
-        >
+        <view class="session-item" v-for="session in sessions" :key="session.id" :class="{ disabled: !session.canBuy }">
           <view class="session-info">
             <view class="time-box">
               <text class="date">{{ session.date }}</text>
@@ -28,11 +23,8 @@
               <text v-else class="sold-out">已售罄</text>
             </view>
           </view>
-          <radio 
-            :value="session.id.toString()" 
-            :disabled="!session.canBuy"
-            :checked="selectedSessionId === session.id"
-          />
+          <radio :value="session.id.toString()" :disabled="!session.canBuy"
+            :checked="selectedSessionId === session.id" />
         </view>
       </radio-group>
     </view>
@@ -41,12 +33,7 @@
     <view class="ticket-list" v-if="selectedSessionId">
       <view class="section-title">选择票档</view>
       <radio-group @change="handleTicketSelect">
-        <view 
-          class="ticket-item" 
-          v-for="ticket in tickets" 
-          :key="ticket.id"
-          :class="{ disabled: ticket.stock === 0 }"
-        >
+        <view class="ticket-item" v-for="ticket in tickets" :key="ticket.id" :class="{ disabled: ticket.stock === 0 }">
           <view class="ticket-info">
             <view class="price-box">
               <text class="price">¥{{ ticket.price }}</text>
@@ -57,11 +44,8 @@
               <text v-else class="sold-out">已售罄</text>
             </view>
           </view>
-          <radio 
-            :value="ticket.id.toString()" 
-            :disabled="ticket.stock === 0"
-            :checked="selectedTicketId === ticket.id"
-          />
+          <radio :value="ticket.id.toString()" :disabled="ticket.stock === 0"
+            :checked="selectedTicketId === ticket.id" />
         </view>
       </radio-group>
     </view>
@@ -70,17 +54,10 @@
     <view class="quantity-section" v-if="selectedTicketId">
       <view class="section-title">购买数量</view>
       <view class="quantity-box">
-        <button 
-          class="qty-btn" 
-          @click="decreaseQuantity"
-          :disabled="quantity <= 1"
-        >-</button>
+        <button class="qty-btn" @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
         <text class="quantity">{{ quantity }}</text>
-        <button 
-          class="qty-btn" 
-          @click="increaseQuantity"
-          :disabled="quantity >= maxQuantity || quantity >= selectedTicket?.stock"
-        >+</button>
+        <button class="qty-btn" @click="increaseQuantity"
+          :disabled="quantity >= maxQuantity || quantity >= selectedTicket?.stock">+</button>
       </view>
     </view>
 
@@ -90,11 +67,7 @@
         <text>总价：</text>
         <text class="amount">¥{{ totalAmount }}</text>
       </view>
-      <button 
-        class="confirm-btn" 
-        :disabled="!canConfirm" 
-        @click="handleConfirm"
-      >确认选择</button>
+      <button class="confirm-btn" :disabled="!canConfirm" @click="handleConfirm">确认选择</button>
     </view>
   </view>
 </template>
@@ -243,7 +216,7 @@ const increaseQuantity = () => {
 // 确认选择
 const handleConfirm = () => {
   if (!selectedTicket.value || !canConfirm.value) return
-  
+
   // 跳转到确认订单页面，传递必要的参数
   uni.navigateTo({
     url: `/pages/order/confirm?performanceId=${performanceId.value}&sessionId=${selectedSessionId.value}&ticketId=${selectedTicket.value.id}&quantity=${quantity.value}`
@@ -262,14 +235,14 @@ const handleConfirm = () => {
   background-color: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  
+
   .title {
     font-size: 32rpx;
     font-weight: bold;
     color: $uni-text-color;
     margin-bottom: 20rpx;
   }
-  
+
   .details {
     .venue {
       font-size: 28rpx;
@@ -299,41 +272,41 @@ const handleConfirm = () => {
   align-items: center;
   padding: 20rpx;
   border-bottom: 1rpx solid #eee;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &.disabled {
     opacity: 0.6;
   }
-  
+
   .session-info {
     flex: 1;
     margin-right: 20rpx;
-    
+
     .time-box {
       display: flex;
       align-items: baseline;
       gap: 20rpx;
       margin-bottom: 10rpx;
-      
+
       .date {
         font-size: 32rpx;
         font-weight: bold;
         color: $uni-text-color;
       }
-      
+
       .time {
         font-size: 28rpx;
         color: $uni-text-color;
       }
     }
-    
+
     .status {
       font-size: 24rpx;
       color: $uni-text-color-grey;
-      
+
       .sold-out {
         color: #ff4d4f;
       }
@@ -353,41 +326,41 @@ const handleConfirm = () => {
   align-items: center;
   padding: 20rpx;
   border-bottom: 1rpx solid #eee;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &.disabled {
     opacity: 0.6;
   }
-  
+
   .ticket-info {
     flex: 1;
     margin-right: 20rpx;
-    
+
     .price-box {
       display: flex;
       align-items: baseline;
       gap: 10rpx;
       margin-bottom: 10rpx;
-      
+
       .price {
         font-size: 36rpx;
         font-weight: bold;
         color: #ff4d4f;
       }
-      
+
       .area {
         font-size: 28rpx;
         color: $uni-text-color;
       }
     }
-    
+
     .stock {
       font-size: 24rpx;
       color: $uni-text-color-grey;
-      
+
       .sold-out {
         color: #ff4d4f;
       }
@@ -399,12 +372,12 @@ const handleConfirm = () => {
   background-color: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  
+
   .quantity-box {
     display: flex;
     align-items: center;
     gap: 20rpx;
-    
+
     .qty-btn {
       width: 60rpx;
       height: 60rpx;
@@ -413,13 +386,13 @@ const handleConfirm = () => {
       border: 1rpx solid #ddd;
       border-radius: 4rpx;
       background-color: #fff;
-      
+
       &:disabled {
         opacity: 0.5;
         background-color: #f5f5f5;
       }
     }
-    
+
     .quantity {
       font-size: 32rpx;
       color: $uni-text-color;
@@ -440,18 +413,18 @@ const handleConfirm = () => {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-  
+
   .total-price {
     font-size: 28rpx;
     color: $uni-text-color;
-    
+
     .amount {
       font-size: 36rpx;
       font-weight: bold;
       color: #ff4d4f;
     }
   }
-  
+
   .confirm-btn {
     width: 240rpx;
     height: 80rpx;
@@ -460,7 +433,7 @@ const handleConfirm = () => {
     color: #fff;
     font-size: 32rpx;
     border-radius: 40rpx;
-    
+
     &:disabled {
       background-color: #ccc;
     }

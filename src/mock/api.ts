@@ -41,7 +41,7 @@ export const performanceApi = {
   getTicketList: async (performanceId: string, sessionId: number) => {
     await delay(500)
     const performance = performances.find(item => item.id === performanceId)
-    const session = performance?.sessions.find(s => s.id === sessionId)
+    const session = performance?.sessions?.find(s => s.id === sessionId)
     return { code: 0, data: session?.tickets || [], message: 'success' }
   }
 }

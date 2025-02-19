@@ -1,14 +1,8 @@
 <template>
   <view class="content">
     <!-- 演出列表 -->
-    <scroll-view
-      class="performance-list"
-      scroll-y
-      @scrolltolower="loadMore"
-      @refresherrefresh="onRefresh"
-      refresher-enabled
-      :refresher-triggered="isRefreshing"
-    >
+    <scroll-view class="performance-list" scroll-y @scrolltolower="loadMore" @refresherrefresh="onRefresh"
+      refresher-enabled :refresher-triggered="isRefreshing">
       <view class="performance-item" v-for="item in performanceList" :key="item.id" @click="goToDetail(item.id)">
         <image class="cover-image" :src="item.coverUrl" mode="aspectFill" />
         <view class="info-box">
@@ -39,9 +33,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { performanceApi } from '@/mock/api'
+import type { Performance } from '@/types'
 
 // 演出列表数据
-const performanceList = ref([])
+const performanceList = ref<Partial<Performance>[]>([])
 
 // 加载状态
 const isLoading = ref(false)
@@ -49,7 +44,8 @@ const noMore = ref(false)
 const isRefreshing = ref(false)
 
 // 跳转到详情页
-const goToDetail = (id: string) => {
+const goToDetail = (id: number | string | undefined) => {
+  if (!id) return
   console.log('跳转到详情页', id)
   uni.navigateTo({
     url: `/pages/performance/detail?id=${id}`
@@ -59,7 +55,7 @@ const goToDetail = (id: string) => {
 // 加载更多
 const loadMore = async () => {
   if (isLoading.value || noMore.value) return
-  
+
   isLoading.value = true
   try {
     const res = await performanceApi.getPerformanceList()
@@ -148,7 +144,8 @@ onMounted(() => {
       color: #666;
       margin-bottom: 16rpx;
 
-      .time, .location {
+      .time,
+      .location {
         display: flex;
         align-items: center;
         margin-bottom: 12rpx;
@@ -190,7 +187,9 @@ onMounted(() => {
     }
   }
 }
-.loading, .no-more {
+
+.loading,
+.no-more {
   text-align: center;
   padding: 20rpx;
   color: #999;
