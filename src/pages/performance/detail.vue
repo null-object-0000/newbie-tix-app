@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { performances } from '@/mock/performances'
+import { performanceApi } from '@/mock/api'
 import { onLoad } from '@dcloudio/uni-app'
 import type { Performance } from '@/types'
 
@@ -74,16 +74,16 @@ onMounted(() => {
 const performance = ref<Performance>()
 
 // 获取演出详情
-const getPerformanceDetail = () => {
+const getPerformanceDetail = async () => {
   if (!performanceId.value) return
 
-  // 从mock数据中查找对应id的演出
-  const found = performances.find(p => p.id === performanceId.value)
-  if (found) {
+  // 通过API获取演出详情
+  const result = await performanceApi.getPerformanceDetail(performanceId.value)
+  if (result && result.data) {
     performance.value = {
-      ...found,
-      notices: found.notices,
-      canBuy: found.status === 'on_sale'
+      ...result.data,
+      notices: result.data.notices,
+      canBuy: result.data.status === 'on_sale'
     }
   }
 }

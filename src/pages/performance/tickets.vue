@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
-import { performances } from '@/mock/performances'
+import { performanceApi } from '@/mock/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
@@ -102,14 +102,14 @@ const selectedSessionId = ref<number>()
 const tickets = ref<PerformanceTicket[]>([])
 
 // 获取演出详情和票档数据
-const getPerformanceTickets = () => {
+const getPerformanceTickets = async () => {
   if (!performanceId.value) return
 
-  // 从mock数据中查找对应id的演出
-  const found = performances.find(p => p.id === performanceId.value.toString())
-  if (found) {
-    performance.value = found
-    sessions.value = found.sessions || []
+  // 通过API获取演出详情
+  const result = await performanceApi.getPerformanceDetail(performanceId.value)
+  if (result && result.data) {
+    performance.value = result.data
+    sessions.value = result.data.sessions || []
   }
 }
 

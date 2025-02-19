@@ -57,8 +57,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { Performance, Order } from '@/types'
-import { performances } from '@/mock/performances'
+import type { Performance } from '@/types'
+import { performanceApi } from '@/mock/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
@@ -103,16 +103,23 @@ const finalAmount = computed(() => {
 
 // 获取订单信息
 const getOrderInfo = async () => {
-  // 从mock数据获取演出信息
-  const mockPerformance = performances.find(p => p.id.toString() === performanceId.value)
-  if (mockPerformance) {
-    performance.value = mockPerformance
-  }
+  if (!performanceId.value) return
 
-  // TODO: 从后端获取票档信息
-  ticket.value = {
-    area: 'A区',
-    price: 1280
+  // 通过API获取演出详情
+  const result = await performanceApi.getPerformanceDetail(performanceId.value)
+  if (result && result.data) {
+    performance.value = result.data
+
+    // 获取选中的场次和票档信息
+    const session = result.data.sessions?.find(s => s.id.toString() === sessionId.value)
+    const selectedTicket = session?.tickets?.find(t => t.id.toString() === ticketId.value)
+
+    if (selectedTicket) {
+      ticket.value = {
+        area: selectedTicket.area,
+        price: selectedTicket.price
+      }
+    }
   }
 }
 
