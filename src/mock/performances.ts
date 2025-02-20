@@ -180,5 +180,24 @@ export const performances = [
                 ]
             }
         ]
+    },
+    {
+        id: 4,
+        title: '五月天2025巡回演唱会',
+        coverUrl: '/static/demo/mayday.jpg',
+        images: [
+            '/static/demo/mayday.jpg'
+        ],
+        showTime: '2024-05-01 19:30',
+        venue: '深圳世界之窗',
+        minPrice: 880,
+        maxPrice: 1580,
+        status: 'on_sale',
+        description: '<p>五月天2024巡回演唱会深圳站，带来震撼视听体验。</p>',
+        notices: [
+            '观众需在演出开始前60分钟入场',
+            '演出过程中请勿拍照、摄像',
+            '演出票品一经售出，不退不换'
+        ],
     }
 ] as Performance[]

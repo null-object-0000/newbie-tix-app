@@ -118,7 +118,6 @@ const getOrderDetail = async (orderNo: string) => {
       order.value.statusText = '待支付'
     }
 
-
     // 获取演出信息
     const foundPerformance = performances.find(item => item.id === foundOrder.performanceId)
     if (foundPerformance) {

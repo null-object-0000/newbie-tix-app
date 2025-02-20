@@ -59,6 +59,17 @@ const loadMore = async () => {
   try {
     const res = await performanceApi.getPerformanceList()
     if (res.code === 0 && res.data.length > 0) {
+      // 根据 status 赋值 statusText
+      res.data.forEach((item) => {
+        if (item.status === 'on_sale') {
+          item.statusText = '售卖中'
+        } else if (item.status === 'coming_soon') {
+          item.statusText = '待开售'
+        } else if (item.status === 'sold_out') {
+          item.statusText = '已售罄'
+        }
+      })
+
       performanceList.value = [...performanceList.value, ...res.data]
     } else {
       noMore.value = true
@@ -102,6 +113,14 @@ onMounted(() => {
   height: 100vh;
   box-sizing: border-box;
   padding: 20rpx;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  uni-scroll-view .uni-scroll-view::-webkit-scrollbar {
+    display: none
+  }
 }
 
 .performance-item {

@@ -13,12 +13,6 @@
 			}
 		},
 		{
-			"path": "pages/user/orders",
-			"style": {
-				"navigationBarTitleText": "我的订单"
-			}
-		},
-		{
 			"path": "pages/performance/detail",
 			"style": {
 				"navigationBarTitleText": "演出详情"
