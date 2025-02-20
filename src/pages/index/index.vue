@@ -2,18 +2,18 @@
   <view class="content">
     <!-- 演出列表 -->
     <scroll-view class="performance-list" scroll-y @scrolltolower="loadMore" @refresherrefresh="onRefresh"
-      refresher-enabled :refresher-triggered="isRefreshing">
+      refresher-enabled :refresher-triggered="isRefreshing" lower-threshold="100">
       <view class="performance-item" v-for="item in performanceList" :key="item.id" @click="goToDetail(item.id)">
         <image class="cover-image" :src="item.coverUrl" mode="aspectFill" />
         <view class="info-box">
           <text class="title">{{ item.title }}</text>
           <view class="details">
             <view class="time">
-              <text class="iconfont">&#xe6be;</text>
+              <text class="iconfont">🕒</text>
               <text>{{ item.showTime }}</text>
             </view>
             <view class="location">
-              <text class="iconfont">&#xe651;</text>
+              <text class="iconfont">📍</text>
               <text>{{ item.venue }}</text>
             </view>
           </view>
