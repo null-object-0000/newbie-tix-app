@@ -18,7 +18,8 @@
             </view>
           </view>
           <view class="price-box">
-            <text class="price">¥{{ item.minPrice }}起</text>
+            <text class="price" v-if="item.minPrice">¥{{ item.minPrice }}起</text>
+            <text class="price" v-else>价格待定</text>
             <text class="status" :class="item.status">{{ item.statusText }}</text>
           </view>
         </view>
@@ -68,26 +69,23 @@ const fullInfo = (res: Performance[]) => {
   return res
 }
 
+// 分页参数
+const currentPage = ref(1)
+const pageSize = ref(5)
+
 // 加载更多
 const loadMore = async () => {
   if (isLoading.value || noMore.value) return
 
   isLoading.value = true
   try {
-    const res = await performanceApi.getPerformanceList()
+    const res = await performanceApi.getPerformanceList({
+      page: currentPage.value,
+      size: pageSize.value
+    })
     if (res.length > 0) {
-      // 根据 status 赋值 statusText
-      res.forEach((item) => {
-        if (item.status === 'ON_SALE') {
-          item.statusText = '售卖中'
-        } else if (item.status === 'COMING_SOON') {
-          item.statusText = '待开售'
-        } else if (item.status === 'SOLD_OUT') {
-          item.statusText = '已售罄'
-        }
-      })
-
       performanceList.value = [...performanceList.value, ...fullInfo(res)]
+      currentPage.value++
     } else {
       noMore.value = true
     }
@@ -101,11 +99,16 @@ const loadMore = async () => {
 // 刷新列表
 const onRefresh = async () => {
   isRefreshing.value = true
+  currentPage.value = 1
+  noMore.value = false
   try {
-    const res = await performanceApi.getPerformanceList()
+    const res = await performanceApi.getPerformanceList({
+      page: currentPage.value,
+      size: pageSize.value
+    })
     if (res) {
       performanceList.value = fullInfo(res)
-      noMore.value = false
+      currentPage.value++
     }
   } catch (error) {
     console.error('刷新演出列表失败:', error)

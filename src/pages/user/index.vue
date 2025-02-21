@@ -315,63 +315,63 @@ onMounted(() => {
       padding: 20rpx;
       margin-bottom: 20rpx;
       box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-    
+
       &:last-child {
         margin-bottom: 0;
       }
-    
+
       .order-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20rpx;
-    
+
         .order-no {
           font-size: 24rpx;
           color: #666;
         }
-    
+
         .order-status {
           font-size: 24rpx;
-    
+
           &.unpaid {
             color: #ff4d4f;
           }
-    
+
           &.completed {
             color: #52c41a;
           }
         }
       }
-    
+
       .performance-info {
         display: flex;
         margin-bottom: 20rpx;
-    
+
         .cover {
           width: 160rpx;
           height: 200rpx;
           border-radius: 8rpx;
           margin-right: 20rpx;
         }
-    
+
         .info {
           flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-    
+
           .title {
             font-size: 28rpx;
             font-weight: bold;
             color: #333;
           }
-    
+
           .time {
             font-size: 24rpx;
             color: #666;
           }
-    
+
           .price {
             font-size: 32rpx;
             color: #ff4d4f;
@@ -379,23 +379,23 @@ onMounted(() => {
           }
         }
       }
-    
+
       .order-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding-top: 20rpx;
         border-top: 1rpx solid #eee;
-    
+
         .total {
           font-size: 28rpx;
           color: #333;
         }
-    
+
         .btn-group {
           display: flex;
           gap: 20rpx;
-    
+
           .action-btn {
             margin: 0;
             padding: 0 30rpx;
@@ -403,12 +403,12 @@ onMounted(() => {
             line-height: 60rpx;
             font-size: 24rpx;
             border-radius: 30rpx;
-    
+
             &.pay-btn {
               background-color: $uni-color-primary;
               color: #fff;
             }
-    
+
             &.detail-btn {
               background-color: #f5f5f5;
               color: #666;

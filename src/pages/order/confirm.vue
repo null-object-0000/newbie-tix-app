@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { Performance, PerformanceSession, PerformanceTicket } from '@/types'
-import { performanceApi } from '@/mock/api'
+import { performanceApi } from '@/services/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
@@ -89,16 +89,13 @@ const getOrderInfo = async () => {
   if (!performanceId.value) return
 
   // 通过API获取演出详情
-  const result = await performanceApi.getPerformanceDetail(performanceId.value)
-  if (result && result.data) {
-    performance.value = result.data
+  performance.value = await performanceApi.getPerformanceDetail(performanceId.value)
 
-    // 获取选中的场次和票档信息
-    const selectedSession = result.data.sessions?.find(s => s.id === sessionId.value)
-    if (selectedSession) {
-      session.value = selectedSession
-      ticket.value = selectedSession.tickets?.find(t => t.id === ticketId.value)
-    }
+  // 获取选中的场次和票档信息
+  const selectedSession = performance.value.sessions?.find(s => s.id === sessionId.value)
+  if (selectedSession) {
+    session.value = selectedSession
+    ticket.value = selectedSession.tickets?.find(t => t.id === ticketId.value)
   }
 }
 

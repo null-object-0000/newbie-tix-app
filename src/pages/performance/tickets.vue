@@ -13,17 +13,17 @@
       <view class="section-title">选择场次</view>
       <radio-group @change="handleSessionSelect">
         <label class="session-item" v-for="session in sessions" :key="session.id"
-          :class="{ disabled: session.status === 'sold_out', selected: selectedSessionId === session.id }">
+          :class="{ disabled: session.status === 'SOLD_OUT', selected: selectedSessionId === session.id }">
           <view class="session-info">
             <view class="time-box">
               <text class="date">{{ formatDate(session.startShowTime) }}</text>
               <text class="time">{{ formatTime(session.startShowTime) }}</text>
             </view>
-            <view class="status-tag" :class="{ 'sold-out': session.status === 'sold_out' }">
-              {{ session.status === 'on_sale' ? '可购买' : '已售罄' }}
+            <view class="status-tag" :class="{ 'sold-out': session.status === 'SOLD_OUT' }">
+              {{ session.status === 'ON_SALE' ? '可购买' : '已售罄' }}
             </view>
           </view>
-          <radio class="hidden-radio" :value="session.id.toString()" :disabled="session.status === 'sold_out'"
+          <radio class="hidden-radio" :value="session.id.toString()" :disabled="session.status === 'SOLD_OUT'"
             :checked="selectedSessionId === session.id" />
         </label>
       </radio-group>
@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { Performance, PerformanceSession } from '@/types'
-import { performanceApi } from '@/mock/api'
+import { performanceApi } from '@/services/api'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 获取路由参数
@@ -129,11 +129,8 @@ const canConfirm = computed(() => {
 const getPerformanceTickets = async () => {
   if (!performanceId.value) return
 
-  const result = await performanceApi.getPerformanceDetail(performanceId.value)
-  if (result && result.data) {
-    performance.value = result.data
-    sessions.value = result.data.sessions || []
-  }
+  performance.value = await performanceApi.getPerformanceDetail(performanceId.value)
+  sessions.value = performance.value.sessions || []
 }
 
 // 处理场次选择
