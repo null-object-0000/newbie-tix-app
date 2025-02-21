@@ -10,11 +10,11 @@
           <view class="details">
             <view class="time">
               <text class="iconfont">🕒</text>
-              <text>{{ item.showTime }}</text>
+              <text>{{ item.showTime || '暂未公布' }}</text>
             </view>
             <view class="location">
               <text class="iconfont">📍</text>
-              <text>{{ item.venue }}</text>
+              <text>{{ item.venue || '暂未公布' }}</text>
             </view>
           </view>
           <view class="price-box">
@@ -212,14 +212,22 @@ onMounted(() => {
         padding: 4rpx 12rpx;
         border-radius: 4rpx;
 
-        &.on-sale {
+        &.ON_SALE {
           background-color: #f6ffed;
           color: #52c41a;
+          border: 1rpx solid #b7eb8f;
         }
 
-        &.coming-soon {
+        &.COMING_SOON {
           background-color: #e6f7ff;
           color: #1890ff;
+          border: 1rpx solid #91d5ff;
+        }
+
+        &.SOLD_OUT {
+          background-color: #fff1f0;
+          color: #ff4d4f;
+          border: 1rpx solid #ffa39e;
         }
       }
     }

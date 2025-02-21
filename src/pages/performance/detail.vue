@@ -10,17 +10,18 @@
     <!-- 基本信息 -->
     <view class="info-section">
       <view class="title">{{ performance.title }}</view>
-      <view class="price">¥{{ performance.minPrice }}起</view>
+      <view class="price" v-if="performance.minPrice">¥{{ performance.minPrice }}起</view>
+      <view class="price" v-else>价格待定</view>
 
       <!-- 演出信息 -->
       <view class="info-list">
         <view class="info-item">
           <text class="label">演出时间</text>
-          <text class="value">{{ performance.showTime }}</text>
+          <text class="value">{{ performance.showTime || '暂未公布' }}</text>
         </view>
         <view class="info-item">
           <text class="label">演出场馆</text>
-          <text class="value">{{ performance.venue }}</text>
+          <text class="value">{{ performance.venue || '暂未公布' }}</text>
         </view>
       </view>
     </view>
@@ -90,6 +91,11 @@ const getPerformanceDetail = async () => {
       performance.value.statusText = '即将开售'
     } else if (performance.value.status === 'SOLD_OUT') {
       performance.value.statusText = '已售罄'
+    }
+
+    // 如果价格待定，则不可购买
+    if (!performance.value.minPrice) {
+      performance.value.statusText = ''
     }
   }
 }

@@ -2,8 +2,8 @@
 import type { Performance } from '@/types'
 
 // API基础配置
-const BASE_URL = 'http://localhost:9000'
-// const BASE_URL = 'https://newbie-tix-agclrqqnvz.cn-shanghai.fcapp.run'
+// const BASE_URL = 'http://localhost:9000'
+const BASE_URL = 'https://newbie-tix-agclrqqnvz.cn-shanghai.fcapp.run'
 
 // 演出相关接口
 export const performanceApi = {
