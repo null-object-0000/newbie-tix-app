@@ -63,6 +63,7 @@ export interface PerformanceTicket {
     title: string
     /** 票价 */
     price: number
+    status: PerformanceStatus
     /** 是否有库存 */
     hasStock: boolean
 }

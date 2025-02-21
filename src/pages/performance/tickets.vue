@@ -66,7 +66,7 @@
         <text>总价：</text>
         <text class="amount">¥{{ totalAmount }}</text>
       </view>
-      <button class="confirm-btn" :disabled="!canConfirm" @click="handleConfirm">确认选择</button>
+      <button class="confirm-btn" :class="{ disabled: canConfirm !== true }" @click="handleConfirm">确认选择</button>
     </view>
   </view>
 </template>
@@ -386,7 +386,7 @@ const handleConfirm = () => {
     text-align: center;
     margin: 0;
 
-    &:disabled {
+    &.disabled {
       opacity: 0.6;
       background-color: #ccc;
     }
