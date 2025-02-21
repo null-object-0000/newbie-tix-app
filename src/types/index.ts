@@ -1,5 +1,5 @@
 /** 演出状态类型 - 表示演出当前销售状态 */
-export type PerformanceStatus = 'on_sale' | 'coming_soon' | 'sold_out'
+export type PerformanceStatus = 'ON_SALE' | 'COMING_SOON' | 'SOLD_OUT'
 
 /** 演出信息 - 包含演出的所有基本信息和状态 */
 export interface Performance {

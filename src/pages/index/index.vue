@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { performanceApi } from '@/mock/api'
+import { performanceApi } from '@/services/api'
 import type { Performance } from '@/types'
 
 // 演出列表数据
@@ -51,6 +51,23 @@ const goToDetail = (id: number) => {
   })
 }
 
+const fullInfo = (res: Performance[]) => {
+  if (res && res.length > 0) {
+    // 根据 status 赋值 statusText
+    res.forEach((item) => {
+      if (item.status === 'ON_SALE') {
+        item.statusText = '售卖中'
+      } else if (item.status === 'COMING_SOON') {
+        item.statusText = '待开售'
+      } else if (item.status === 'SOLD_OUT') {
+        item.statusText = '已售罄'
+      }
+    })
+  }
+
+  return res
+}
+
 // 加载更多
 const loadMore = async () => {
   if (isLoading.value || noMore.value) return
@@ -58,19 +75,19 @@ const loadMore = async () => {
   isLoading.value = true
   try {
     const res = await performanceApi.getPerformanceList()
-    if (res.code === 0 && res.data.length > 0) {
+    if (res.length > 0) {
       // 根据 status 赋值 statusText
-      res.data.forEach((item) => {
-        if (item.status === 'on_sale') {
+      res.forEach((item) => {
+        if (item.status === 'ON_SALE') {
           item.statusText = '售卖中'
-        } else if (item.status === 'coming_soon') {
+        } else if (item.status === 'COMING_SOON') {
           item.statusText = '待开售'
-        } else if (item.status === 'sold_out') {
+        } else if (item.status === 'SOLD_OUT') {
           item.statusText = '已售罄'
         }
       })
 
-      performanceList.value = [...performanceList.value, ...res.data]
+      performanceList.value = [...performanceList.value, ...fullInfo(res)]
     } else {
       noMore.value = true
     }
@@ -86,8 +103,8 @@ const onRefresh = async () => {
   isRefreshing.value = true
   try {
     const res = await performanceApi.getPerformanceList()
-    if (res.code === 0) {
-      performanceList.value = res.data
+    if (res) {
+      performanceList.value = fullInfo(res)
       noMore.value = false
     }
   } catch (error) {
@@ -133,8 +150,8 @@ onMounted(() => {
   padding: 20rpx;
 
   .cover-image {
-    width: 340rpx;
-    height: 458rpx;
+    width: 200rpx;
+    height: calc(200rpx * 1.35);
     border-radius: 8rpx;
   }
 

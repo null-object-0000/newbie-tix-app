@@ -17,6 +17,22 @@ export const performanceApi = {
   getPerformanceDetail: async (id: number) => {
     await delay(500)
     const performance = performances.find(item => item.id === id)
+    if (!performance) {
+      return { code: 404, data: null, message: 'not found' }
+    }
+
+    // 如果 images 是字符串，将其转换为数组
+    if (typeof performance?.images === 'string') {
+      performance.images = JSON.parse(performance.images)
+    }
+    // 如果 images 为空时，使用 coverUrl
+    if (!performance?.images || performance.images.length === 0) {
+      performance.images = [performance?.coverUrl]
+    }
+    // 如果 notes 是字符串，将其转换为数组
+    if (typeof performance?.notices === 'string') {
+      performance.notices = JSON.parse(performance.notices)
+    }
     return { code: 0, data: performance, message: 'success' }
   },
 

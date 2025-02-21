@@ -63,6 +63,25 @@ pnpm dev
 pnpm build
 ```
 
+## 相关项目
+
+- [newbie-tix-manager](https://github.com/null-object-0000/newbie-tix-manager)：后台管理系统，提供演出管理、订单管理等功能
+- [newbie-tix-service](https://github.com/null-object-0000/newbie-tix-service)：后端服务，提供 API 接口支持
+
+## 系统架构
+
+```
++-------------------+     +-------------------+     +-------------------+
+|   Newbie Tix APP  |     | Newbie Tix Admin |     |  Newbie Tix API  |
+| (用户移动端应用)  |     |    (管理后台)    |     |   (后端服务)     |
+|  uni-app + Vue 3  |     |      Vue 3       |     |   Spring Boot    |
++--------+----------+     +--------+----------+     +--------+----------+
+         |                        |                          |
+         |                        |                          |
+         +------------------------+--------------------------+
+                            API 接口调用
+```
+
 ## 开发进度
 
 - [x] 演出列表与详情展示

@@ -43,8 +43,8 @@
     </view>
 
     <!-- 底部购票按钮 -->
-    <view class="footer">
-      <button class="buy-btn" :disabled="performance.status !== 'on_sale'" @click="handleBuy">
+    <view class="footer" v-if="performance.statusText">
+      <button class="buy-btn" :disabled="performance.status !== 'ON_SALE'" @click="handleBuy">
         {{ performance.statusText }}
       </button>
     </view>
@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { performanceApi } from '@/mock/api'
+import { performanceApi } from '@/services/api'
 import { onLoad } from '@dcloudio/uni-app'
 import type { Performance } from '@/types'
 
@@ -77,13 +77,18 @@ const getPerformanceDetail = async () => {
 
   // 通过API获取演出详情
   const result = await performanceApi.getPerformanceDetail(performanceId.value)
-  if (result && result.data) {
-    performance.value = result.data
-    if (performance.value.status === 'on_sale') {
+  if (result) {
+    performance.value = result
+    // 处理富文本中的图片样式
+    if (performance.value.description) {
+      performance.value.description = performance.value.description.replace(/style=""/gi, '')
+      performance.value.description = performance.value.description.replace(/<img/gi, '<img style="width: 100%; max-width: 100%; height: auto;"')
+    }
+    if (performance.value.status === 'ON_SALE') {
       performance.value.statusText = '立即购票'
-    } else if (performance.value.status === 'coming_soon') {
+    } else if (performance.value.status === 'COMING_SOON') {
       performance.value.statusText = '即将开售'
-    } else if (performance.value.status === 'sold_out') {
+    } else if (performance.value.status === 'SOLD_OUT') {
       performance.value.statusText = '已售罄'
     }
   }
@@ -91,7 +96,7 @@ const getPerformanceDetail = async () => {
 
 // 处理购票
 const handleBuy = () => {
-  if (performance.value?.status !== 'on_sale') return
+  if (performance.value?.status !== 'ON_SALE') return
   uni.navigateTo({
     url: `/pages/performance/tickets?id=${performanceId.value}`
   })
